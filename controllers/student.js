@@ -4,9 +4,7 @@ const db = require('../config/db');
 const getAllStudents = async (req, res) => {
     try {
         const [rows] = await db.query('SELECT * FROM student ORDER BY id ASC');
-
-        console.log(rows[3]);
-
+        // console.log(rows[3]);
         res.status(200).json({ success: true, count: rows.length, data: rows });
     } catch (error) {
         console.error('getAllStudents error:', error.message);
@@ -14,13 +12,10 @@ const getAllStudents = async (req, res) => {
     }
 };
 
-
-// ─── READ ONE ── GET /api/students/:id
+// ─── READ ONE ── GET /api/students/getbyId/:id
 const getStudentById = async (req, res) => {
     try {
         const { id } = req.params;
-        // console.log(req.body);
-
         const [rows] = await db.query('SELECT * FROM student WHERE id = ?', [id]);
 
         if (rows.length === 0) {
@@ -29,43 +24,29 @@ const getStudentById = async (req, res) => {
         else {
             res.status(200).json({ success: true, data: rows[0] });
         }
-
     } catch (error) {
-        console.error('❌ getStudentById error:', error.message);
+        console.error('getStudentById error:', error.message);
         res.status(500).json({ success: false, message: 'Server error', error: error.message });
     }
 };
 
-
+// ─── CREATE ──── POST /api/students/create
+// Body (JSON): { "name": "Shrawi", "email": shrawi@gmail.com }
 const createStudent = async (req, res) => {
     try {
         const { name, email, created_at } = req.body;
-
         if (!name || !email) {
-            return res.status(400).json({
-                success: false,
-                message: 'Please provide name and email'
-            });
+            return res.status(400).json({ success: false, message: 'Please provide name and email'});
         }
-
-        const [result] = await db.query(
-            'INSERT INTO student(name, email) VALUES(?,?)',
-            [name, email]
-        );
+        const [result] = await db.query( 'INSERT INTO student(name, email) VALUES(?,?)', [name, email]);
         console.log("Result:", result);
 
-        const [rows] = await db.query( 'SELECT * FROM student WHERE id = ?', [result.insertId] );
-        console.log(rows[0]);
-
-        res.status(201).json({
-            success: true,
-            message: 'Student created successfully',
-            data: { id: result.insertId, name, email, created_at }
-        });
+        // const [rows] = await db.query( 'SELECT * FROM student WHERE id = ?', [result.insertId] );
+        // console.log(rows[0]);
+        res.status(201).json({ success: true, message: 'Student created successfully', data: {id: result.insertId, name, email, created_at}}); // result.insertId gives us the auto-generated id
     }
     catch (error) {
-        // MySQL error 1062 = Duplicate entry (email already exists)
-        if (error.code === 'ER_DUP_ENTRY') {
+        if (error.code === 'ER_DUP_ENTRY') { 
             return res.status(409).json({ success: false, message: 'A student with that email already exists' });
         }
         console.error('createStudent error:', error.message);
@@ -73,30 +54,24 @@ const createStudent = async (req, res) => {
     }
 };
 
+// ─── UPDATE ─── PUT /api/students/:id
+// Body (JSON): { "name": "...", "email": "..."}
 const updateStudent = async (req, res) => {
     try {
         const { id } = req.params;
         const { name, email } = req.body;
-
-        if (!name || !email ) {
-            return res.status(400).json({
-                success: false,
-                message: 'Please provide name and email'
-            });
+         if (!name || !email) {
+            return res.status(400).json({ success: false, message: 'Please provide name and email'});
         }
 
-        const [result] = await db.query( 'UPDATE student SET name = ?, email = ? WHERE id = ?', [name, email, id]);
+        const [result] = await db.query('UPDATE student SET name = ?, email = ? WHERE id = ?', [name, email, id]);
 
-
-        if (result.affectedRows === 0) { // affectedRows = 0 means no row matched that id
+        if (result.affectedRows === 0) {     // affectedRows = 0 means no row matched that id
             return res.status(404).json({ success: false, message: `Student with id ${id} not found` });
         }
-        res.status(200).json({
-            success: true,
-            message: 'Student updated successfully',
-            data: { id: parseInt(id), name, email }
-        });
-    } catch (error) {
+        res.status(200).json({ success: true, message: 'Student updated successfully', data: {id: parseInt(id), name, email }});
+    } 
+    catch (error) {
         if (error.code === 'ER_DUP_ENTRY') {
             return res.status(409).json({ success: false, message: 'Student with that email already exists' });
         }
@@ -105,26 +80,22 @@ const updateStudent = async (req, res) => {
     }
 };
 
+// ─── DELETE ──── DELETE /api/students/:id
 const deleteStudent = async (req, res) => {
     try {
         const { id } = req.params;
 
         const [result] = await db.query('DELETE FROM student WHERE id = ?', [id]);
 
-        const [rows] = await db.query( 'SELECT * FROM student WHERE id = ?', [result.insertId] );
-        console.log(rows[0]);
+        // const [rows] = await db.query( 'SELECT * FROM student WHERE id = ?', [result.insertId] );
+        // console.log(rows[0]);
 
         if (result.affectedRows === 0) {
             return res.status(404).json({ success: false, message: `Student with id ${id} not found` });
         }
-
-        res.status(200).json({
-            success: true,
-            message: `Student with id ${id} deleted successfully`
-        });
-
-
-    } catch (error) {
+        res.status(200).json({ success: true, message: `Student with id ${id} deleted successfully` });
+    } 
+    catch (error) {
         console.error('deleteStudent error:', error.message);
         res.status(500).json({ success: false, message: 'Server error', error: error.message });
     }

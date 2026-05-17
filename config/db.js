@@ -7,10 +7,9 @@ const pool = mysql.createPool({
     password: process.env.DB_PASSWORD,  
     database: process.env.DB_NAME,      
     port: process.env.DB_PORT || 3306,
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0
+    waitForConnections: true, //If all connections are busy, new requests will wait.
+    connectionLimit: 10, //Maximum 10 database connections allowed at same time.
+    queueLimit: 0 //No limit on waiting requests.
 });
 
-// .promise() lets us use async/await instead of callbacks
-module.exports = pool.promise();
+module.exports = pool.promise(); // .promise() lets us use async/await instead of callbacks

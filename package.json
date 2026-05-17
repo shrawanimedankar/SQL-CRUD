@@ -4,5 +4,26 @@
     "express": "^5.2.1",
     "mysql2": "^3.22.3",
     "nodemon": "^3.1.14"
-  }
+  },
+  "name": "sql-crud",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shrawanimedankar/SQL-CRUD.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/shrawanimedankar/SQL-CRUD/issues"
+  },
+  "homepage": "https://github.com/shrawanimedankar/SQL-CRUD#readme"
 }
